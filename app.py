@@ -134,7 +134,7 @@ st.markdown("""
 # ============================================================
 st.markdown('<div class="flower-icon">🌺</div>', unsafe_allow_html=True)
 st.markdown('<h1 class="main-title">Clasificador de Flores con IA</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">IA-ISC • Campus Comayagua • 2026 • Angeles Euceda •  20221930061</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">IA-ISC • Campus Comayagua • 2026 • Richard Andino •  20231900184</p>', unsafe_allow_html=True)
 
 st.markdown("""
     <div style="text-align: center; color: #616161; margin-bottom: 2rem;">
