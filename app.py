@@ -10,135 +10,186 @@ from PIL import Image
 # ============================================================
 st.set_page_config(
     page_title="Clasificación de Flores IA_ISC",
-    page_icon="🌸",
+    page_icon="🔮",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ============================================================
-# CSS PERSONALIZADO
+# CSS PERSONALIZADO (NUEVO DISEÑO PREMIUM DARK)
 # ============================================================
 st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap');
         
-        html, body, [class*="css"] {
-            font-family: 'Poppins', sans-serif;
+        /* Ajuste de Fuente Global */
+        html, body, [class*="css"], .stMarkdown {
+            font-family: 'Space Grotesk', sans-serif;
         }
         
+        /* Fondo General de la App en Modo Oscuro */
+        .stApp {
+            background-color: #0F0F1A;
+            color: #E2E8F0;
+        }
+        
+        /* Título Principal */
         .main-title {
             text-align: center;
-            color: #2E7D32;
+            background: linear-gradient(135deg, #A855F7 0%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-weight: 700;
-            font-size: 2.2rem;
-            margin-bottom: 0.3rem;
+            font-size: 2.8rem;
+            margin-bottom: 0.2rem;
+            letter-spacing: -1px;
         }
         
+        /* Subtítulo */
         .subtitle {
             text-align: center;
-            color: #558B2F;
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
+            color: #94A3B8;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
         }
         
-        .upload-box {
-            border: 2px dashed #81C784;
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            background-color: #F1F8E9;
-            transition: all 0.3s ease;
-        }
-        
+        /* Tarjeta de Resultado Principal (Glassmorphism) */
         .result-card {
-            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            box-shadow: 0 8px 32px rgba(46, 125, 50, 0.15);
-            border: 1px solid #A5D6A7;
+            background: rgba(30, 30, 50, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            text-align: center;
         }
         
+        /* Badge del Ganador */
         .winner-badge {
             display: inline-block;
-            background: linear-gradient(135deg, #2E7D32, #43A047);
+            background: linear-gradient(135deg, #7C3AED, #4F46E5);
             color: white;
-            padding: 0.5rem 1.5rem;
+            padding: 0.6rem 2rem;
             border-radius: 50px;
             font-weight: 600;
-            font-size: 1.3rem;
-            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+            margin-top: 0.5rem;
             margin-bottom: 1rem;
+            letter-spacing: 0.5px;
         }
         
+        /* Texto de Confianza */
         .confidence-text {
-            color: #1B5E20;
-            font-size: 1.1rem;
-            font-weight: 500;
+            color: #A78BFA;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
         
+        /* Contenedor de Barras de Probabilidad */
+        .prob-container {
+            background: rgba(15, 15, 26, 0.6);
+            padding: 1rem;
+            border-radius: 16px;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .prob-row {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .prob-label {
+            width: 30%;
+            text-align: left;
+            font-weight: 500;
+            color: #CBD5E1;
+        }
+
         .prob-bar-bg {
-            background-color: #E0E0E0;
-            border-radius: 10px;
-            height: 28px;
-            margin: 8px 0;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            height: 24px;
+            width: 70%;
             overflow: hidden;
+            position: relative;
         }
         
         .prob-bar-fill {
             height: 100%;
-            border-radius: 10px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            padding-left: 12px;
+            justify-content: flex-end;
+            padding-right: 12px;
             color: white;
             font-weight: 600;
-            font-size: 0.85rem;
-            transition: width 1s ease-out;
+            font-size: 0.8rem;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
+        /* Icono Principal flotante */
         .flower-icon {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: -0.5rem;
+            animation: float 3s ease-in-out infinite;
         }
         
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Footer Reestilizado */
         .footer {
             text-align: center;
-            color: #9E9E9E;
+            color: #64748B;
             font-size: 0.8rem;
-            margin-top: 3rem;
-            padding-top: 1rem;
-            border-top: 1px solid #EEEEEE;
+            margin-top: 4rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
         
+        /* Rediseño del Drag & Drop File Uploader */
         .stFileUploader > div > div {
-            background-color: #F1F8E9 !important;
-            border: 2px dashed #81C784 !important;
-            border-radius: 15px !important;
+            background-color: rgba(30, 30, 50, 0.4) !important;
+            border: 2px dashed rgba(168, 85, 247, 0.4) !important;
+            border-radius: 20px !important;
+            color: #E2E8F0 !important;
         }
         
         .stFileUploader > div > div:hover {
-            border-color: #4CAF50 !important;
-            background-color: #E8F5E9 !important;
+            border-color: #6366F1 !important;
+            background-color: rgba(49, 46, 129, 0.2) !important;
         }
-        
+
+        /* Estilo para las imágenes subidas */
         div[data-testid="stImage"] img {
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
         }
     </style>
 """, unsafe_allow_html=True)
 
 # ============================================================
-# ENCABEZADO
+# ENCABEZADO (CON TU NOMBRE Y NUEVO ESTILO)
 # ============================================================
-st.markdown('<div class="flower-icon">🌺</div>', unsafe_allow_html=True)
-st.markdown('<h1 class="main-title">Clasificador de Flores con IA</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">IA-ISC • Campus Comayagua • 2026 • Richard Andino •  20231900184</p>', unsafe_allow_html=True)
+st.markdown('<div class="flower-icon">🔮</div>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-title">Clasificador de Flores Inteligente</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">IA-ISC • Campus Comayagua • 2026 • Richard Orlando Andino Villanueva</p>', unsafe_allow_html=True)
 
 st.markdown("""
-    <div style="text-align: center; color: #616161; margin-bottom: 2rem;">
-        🌿 Sube una imagen de una flor y la inteligencia artificial la identificará al instante
+    <div style="text-align: center; color: #94A3B8; margin-bottom: 2rem; font-size: 1.05rem;">
+        Despliega el poder de la red <b>MobileNetV2</b> para reconocer especies de flores en tiempo real.
     </div>
 """, unsafe_allow_html=True)
 
@@ -166,13 +217,13 @@ FLOWER_ICONS = {
     "tulip": "🌷"
 }
 
-# Colores para cada flor
+# Paleta de colores Neon/Premium para las barras de progreso
 FLOWER_COLORS = {
-    "daisy": "#FFCA28",
-    "dandelion": "#FFD54F",
-    "rose": "#E53935",
-    "sunflower": "#FFB300",
-    "tulip": "#E91E63"
+    "daisy": "linear-gradient(90deg, #F59E0B, #10B981)",
+    "dandelion": "linear-gradient(90deg, #FBBF24, #F59E0B)",
+    "rose": "linear-gradient(90deg, #EF4444, #EC4899)",
+    "sunflower": "linear-gradient(90deg, #F59E0B, #EAB308)",
+    "tulip": "linear-gradient(90deg, #EC4899, #8B5CF6)"
 }
 
 @st.cache_resource
@@ -210,58 +261,73 @@ def predecir(img):
 # ============================================================
 # CARGAR MODELO
 # ============================================================
-with st.spinner("🔄 Cargando modelo de inteligencia artificial..."):
+with st.spinner("⚡ Sintonizando visión artificial de alta precisión..."):
     modelo = cargar_modelo()
     clases = cargar_clases()
 
 # ============================================================
 # UPLOADER
 # ============================================================
-st.markdown("---")
+st.markdown("<br>", unsafe_allow_html=True)
 archivo = st.file_uploader(
-    "📷 Selecciona una imagen de flor",
+    "📷 Sube o arrastra la imagen aquí",
     type=["jpg", "jpeg", "png"],
-    help="Formatos permitidos: JPG, JPEG, PNG"
+    help="Formatos aceptados: JPG, JPEG, PNG"
 )
 
 if archivo:
-    # Mostrar imagen cargada
     imagen = Image.open(archivo)
     
-    col1, col2, col3 = st.columns([1, 3, 1])
+    col1, col2, col3 = st.columns([1, 2.5, 1])
     with col2:
-        st.image(imagen, caption="🖼️ Imagen analizada", use_container_width=True)
+        st.image(imagen, caption="🔮 Entrada del sistema", use_container_width=True)
     
-    # Realizar predicción
-    with st.spinner("🔍 Analizando imagen con IA..."):
+    with st.spinner("🧠 Computando mapa de características..."):
         resultados = predecir(imagen)
     
     ganador_key, ganador_nombre, ganador_prob = resultados[0]
-    
-    # ============================================================
-    # RESULTADO PRINCIPAL
-    # ============================================================
     icono = FLOWER_ICONS.get(ganador_key, "🌸")
-    color = FLOWER_COLORS.get(ganador_key, "#4CAF50")
     
+    # ============================================================
+    # PANEL DE RESULTADOS REESTILIZADO
+    # ============================================================
     st.markdown(f"""
         <div class="result-card">
-            <div style="text-align: center;">
-                <div style="font-size: 4rem; margin-bottom: 0.5rem;">{icono}</div>
-                <div class="winner-badge">{ganador_nombre}</div>
-        </div>
+            <div style="font-size: 4.5rem; margin-bottom: -0.5rem;">{icono}</div>
+            <div class="winner-badge">{ganador_nombre}</div>
+            <div class="confidence-text">Confianza del Sistema: {ganador_prob:.2f}%</div>
+            
+            <div class="prob-container">
+                <div style="text-align: left; font-size: 0.9rem; color: #94A3B8; margin-bottom: 0.5rem; font-weight: 600;">
+                    TOP 3 PROBABILIDADES:
+                </div>
     """, unsafe_allow_html=True)
 
+    # Renderizado dinámico de las 3 predicciones top
+    for key, nombre, prob in resultados:
+        color_bar = FLOWER_COLORS.get(key, "linear-gradient(90deg, #6366F1, #A855F7)")
+        icon_small = FLOWER_ICONS.get(key, "✨")
+        st.markdown(f"""
+            <div class="prob-row">
+                <div class="prob-label">{icon_small} {nombre}</div>
+                <div class="prob-bar-bg">
+                    <div class="prob-bar-fill" style="width: {prob}%; background: {color_bar};">
+                        {prob:.1f}%
+                    </div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
 else:
-    # Estado inicial cuando no hay imagen
+    # Estado inicial vacío (Dashboard vacío elegante)
     st.markdown("""
-        <div style="text-align: center; padding: 3rem 1rem; color: #9E9E9E;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">📤</div>
-            <p style="font-size: 1.1rem;">Arrastra o selecciona una imagen de flor<br>para comenzar la clasificación</p>
-            <p style="font-size: 0.9rem; margin-top: 1rem;">
-                🌼 Margarita &nbsp;•&nbsp; 🌾 Diente de León &nbsp;•&nbsp; 🌹 Rosa<br>
-                🌻 Girasol &nbsp;•&nbsp; 🌷 Tulipán
+        <div style="text-align: center; padding: 4rem 1rem; color: #64748B; border: 1px dashed rgba(255,255,255,0.05); border-radius: 24px; background: rgba(255,255,255,0.01);">
+            <div style="font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.6;">🛸</div>
+            <p style="font-size: 1.1rem; color: #94A3B8;">Esperando archivo de imagen para inicializar diagnóstico...</p>
+            <p style="font-size: 0.85rem; margin-top: 1rem; color: #475569;">
+                Soporte para: Margarita • Diente de León • Rosa • Girasol • Tulipán
             </p>
         </div>
     """, unsafe_allow_html=True)
@@ -271,6 +337,6 @@ else:
 # ============================================================
 st.markdown("""
     <div class="footer">
-        🌿 Clasificador de Flores con MobileNetV2 • Proyecto IA-ISC 2026 
+        🧬 Powered by TensorFlow & MobileNetV2 • Arquitectura de Software 2026 • Desarrollado por Richard Andino
     </div>
 """, unsafe_allow_html=True)
